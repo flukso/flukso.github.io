@@ -3,6 +3,8 @@ import { FormControl, Validators } from '@angular/forms';
 
 import * as dataForge from 'data-forge';
 
+import '../assets/js/tmpo.js';
+
 declare var Tmpo: any;
 
 @Component({
@@ -77,7 +79,7 @@ export class AppComponent {
             (series) => {
               console.log(series);
               
-              var xValues = (series.t as number[]).map(d => new Date(d * 1000));
+              var xValues = (series.t as number[]).map(d => new Date(d * 1000).toISOString());
               console.log(this.diff.value);
               if (!this.diff.value) {
               var yValues = series.v as number[];
@@ -98,7 +100,9 @@ export class AppComponent {
               const link = document.createElement('a');
               link.setAttribute('download', this.sid.value + '.csv');
               link.setAttribute('href', encodeURI(`data:text/csv;charset=utf-8,${df.toCSV()}`));
+              document.body.appendChild(link);
               link.click();
+              document.body.removeChild(link);
             }
           );
         }
