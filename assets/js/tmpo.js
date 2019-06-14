@@ -1,3 +1,4 @@
+
 $.ajaxSetup({
   timeout: 10 * 60 * 1000, // msecs
   cache: false
@@ -32,7 +33,7 @@ class Tmpo {
     this._device_sync()
   }
 
-  sync_sensor(sids, progress_cb = (() => {
+  sync_sensors(sids, progress_cb = (() => {
     return
   })) {
     this.sync_completed = false
@@ -41,7 +42,7 @@ class Tmpo {
 
     this.progress.device.state = "completed"
     this.dbPromise.then(async (db) => {
-      for(let i in sids) {
+      for (let i in sids) {
         this.progress.sensor.state = "running";
         this.progress.sensor.todo++;
         const last = await this._last_block(sids[i]);
@@ -53,6 +54,25 @@ class Tmpo {
       }
       this._progress_cb_handler()
     })
+  }
+
+  sync_devices(dids, progress_cb = (() => {
+    return
+  })) {
+
+    this.sync_completed = false
+    this.progress = this._progress_state_init("waiting")
+    this.progress_cb = progress_cb
+
+    for (let i in dids) {
+      this.progress.device.state = "running"
+      this.progress.device.todo++;
+      this._sensor_sync(dids[i])
+    }
+    if (this.progress.device.state == "waiting") {
+      this.progress.all.state = "completed"
+    }
+    this._progress_cb_handler()
   }
 
   _device_sync() {
